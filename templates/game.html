@@ -1,0 +1,87 @@
+{% extends "base.html" %}
+
+{% block body_class %}game-body{% endblock %}
+
+{% block content %}
+<section class="game-page">
+    <div class="game-shell">
+        <div
+            class="game-stage"
+            data-best-distance="{{ current_user.best_distance|round(0, 'floor')|int }}"
+            data-current-coins="{{ current_user.coins }}"
+            data-dash-unlocked="{{ 1 if current_user.dash_unlocked else 0 }}"
+            data-pounce-unlocked="{{ 1 if current_user.pounce_unlocked else 0 }}"
+            data-glide-unlocked="{{ 1 if current_user.glide_unlocked else 0 }}"
+            data-time-slow-unlocked="{{ 1 if current_user.time_slow_unlocked else 0 }}"
+            data-magnet-unlocked="{{ 1 if current_user.magnet_unlocked else 0 }}"
+            data-fish-frenzy-unlocked="{{ 1 if current_user.fish_frenzy_unlocked else 0 }}"
+            data-equipped-ability-one="{{ current_user.equipped_ability_one or '' }}"
+            data-equipped-ability-two="{{ current_user.equipped_ability_two or '' }}"
+        >
+            <canvas id="gameCanvas"></canvas>
+
+            <div class="game-overlay" id="gameOverlay">
+                <div class="game-start-card" id="gameStartCard">
+                    <p class="card-label" id="overlayLabel">Cat Dash</p>
+                    <h1 id="overlayTitle">Ready to run?</h1>
+                    <p class="game-instructions" id="overlayMessage">
+                        Press Ready, then jump across platforms and collect fish.
+                    </p>
+                    <button class="primary-button game-play-button" id="playButton" type="button">Ready</button>
+                </div>
+
+                <div class="countdown-display hidden" id="countdownDisplay">3</div>
+            </div>
+
+            <div class="game-hud">
+                <div class="hud-pill">Distance: <span id="distanceValue">0</span>m</div>
+                <div class="hud-pill">Fish: <span id="coinValue">0</span></div>
+                <div class="hud-pill">Best Distance: <span id="bestValue">0</span>m</div>
+            </div>
+
+            <div class="ability-hud">
+                {% if equipped_abilities %}
+                    {% for ability in equipped_abilities %}
+                        <div class="ability-card" data-ability-id="{{ ability.id }}">
+                            <div class="ability-keybind">{{ ability.keybind }}</div>
+                            <div class="ability-info">
+                                <p class="ability-name">{{ ability.name }}</p>
+                                <div class="ability-status-wrap">
+                                    <p class="ability-status{% if ability.id == 'magnet' or ability.id == 'time_slow' or ability.id == 'fish_frenzy' %} magnet-status-text{% endif %}" data-ability-status="{{ ability.id }}">Ready</p>
+
+                                    {% if ability.id == "time_slow" %}
+                                        <div class="ability-timer-bar ability-timer-bar-inline hidden" data-time-slow-timer-bar>
+                                            <div class="ability-timer-fill" data-time-slow-timer-fill></div>
+                                        </div>
+                                    {% endif %}
+
+                                    {% if ability.id == "magnet" %}
+                                        <div class="ability-timer-bar ability-timer-bar-inline hidden" data-magnet-timer-bar>
+                                            <div class="ability-timer-fill" data-magnet-timer-fill></div>
+                                        </div>
+                                    {% endif %}
+
+                                    {% if ability.id == "fish_frenzy" %}
+                                            <div class="ability-timer-bar ability-timer-bar-inline hidden" data-fish-frenzy-timer-bar>
+                                                <div class="ability-timer-fill" data-fish-frenzy-timer-fill></div>
+                                            </div>
+                                        {% endif %}
+                                </div>
+                            </div>
+                        </div>
+                    {% endfor %}
+                {% else %}
+                    <div class="ability-card locked empty-ability-card">
+                        <div class="ability-info">
+                            <p class="ability-name">No Abilities Equipped</p>
+                            <p class="ability-status">Open Inventory to equip up to 2 abilities.</p>
+                        </div>
+                    </div>
+                {% endif %}
+            </div>
+        </div>
+    </div>
+</section>
+
+<script src="{{ url_for('static', filename='js/game.js') }}"></script>
+{% endblock %}

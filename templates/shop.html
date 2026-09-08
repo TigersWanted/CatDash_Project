@@ -1,0 +1,135 @@
+{% extends "base.html" %}
+
+{% block content %}
+<section class="stats-page">
+    <div class="stats-header">
+        <div>
+            <p class="card-label">Shop</p>
+            <h1>Abilities Shop</h1>
+        </div>
+    </div>
+
+    <div class="stats-grid">
+        <article class="stats-card">
+            <p class="stats-label">Available Fishes</p>
+            <h2>{{ current_user.coins }}</h2>
+        </article>
+    </div>
+
+    <div class="stats-panel">
+        <div class="panel-heading">
+            <h2>Buy Abilities</h2>
+        </div>
+
+        <div class="shop-grid">
+            <article class="shop-card">
+                <div>
+                    <p class="stats-label">Dash</p>
+                    <p class="shop-copy">{{ ability_definitions["dash"]["description"] }}</p>
+                </div>
+
+                {% if current_user.dash_unlocked %}
+                    <p class="shop-status">Unlocked</p>
+                {% else %}
+                    <form method="POST" action="{{ url_for('purchase_shop_item') }}">
+                        <input type="hidden" name="item" value="dash">
+                        <button class="primary-button shop-button" type="submit">
+                            Unlock for {{ ability_definitions["dash"]["cost"] }} coins
+                        </button>
+                    </form>
+                {% endif %}
+            </article>
+
+            <article class="shop-card">
+                <div>
+                    <p class="stats-label">Pounce</p>
+                    <p class="shop-copy">{{ ability_definitions["pounce"]["description"] }}</p>
+                </div>
+
+                {% if current_user.pounce_unlocked %}
+                    <p class="shop-status">Unlocked</p>
+                {% else %}
+                    <form method="POST" action="{{ url_for('purchase_shop_item') }}">
+                        <input type="hidden" name="item" value="pounce">
+                        <button class="primary-button shop-button" type="submit">
+                            Unlock for {{ ability_definitions["pounce"]["cost"] }} coins
+                        </button>
+                    </form>
+                {% endif %}
+            </article>
+
+            <article class="shop-card">
+                <div>
+                    <p class="stats-label">Glide</p>
+                    <p class="shop-copy">{{ ability_definitions["glide"]["description"] }}</p>
+                </div>
+
+                {% if current_user.glide_unlocked %}
+                    <p class="shop-status">Unlocked</p>
+                {% else %}
+                    <form method="POST" action="{{ url_for('purchase_shop_item') }}">
+                        <input type="hidden" name="item" value="glide">
+                        <button class="primary-button shop-button" type="submit">
+                            Unlock for {{ ability_definitions["glide"]["cost"] }} coins
+                        </button>
+                    </form>
+                {% endif %}
+            </article>
+
+            <article class="shop-card">
+                <div>
+                    <p class="stats-label">Slow-Meow</p>
+                    <p class="shop-copy">{{ ability_definitions["time_slow"]["description"] }}</p>
+                </div>
+
+                {% if current_user.time_slow_unlocked %}
+                    <p class="shop-status">Unlocked</p>
+                {% else %}
+                    <form method="POST" action="{{ url_for('purchase_shop_item') }}">
+                        <input type="hidden" name="item" value="time_slow">
+                        <button class="primary-button shop-button" type="submit">
+                            Unlock for {{ ability_definitions["time_slow"]["cost"] }} coins
+                        </button>
+                    </form>
+                {% endif %}
+            </article>
+
+            <article class="shop-card">
+                <div>
+                    <p class="stats-label">Magnet</p>
+                    <p class="shop-copy">{{ ability_definitions["magnet"]["description"] }}</p>
+                </div>
+            
+                {% if current_user.magnet_unlocked %}
+                    <p class="shop-status">Unlocked</p>
+                {% else %}
+                    <form method="POST" action="{{ url_for('purchase_shop_item') }}">
+                        <input type="hidden" name="item" value="magnet">
+                        <button class="primary-button shop-button" type="submit">
+                            Unlock for {{ ability_definitions["magnet"]["cost"] }} coins
+                        </button>
+                    </form>
+                {% endif %}
+            </article>
+
+            <article class="shop-card">
+                <div>
+                    <p class="stats-label">Fish Frenzy</p>
+                    <p class="shop-copy">{{ ability_definitions["fish_frenzy"]["description"] }}</p>
+                </div>
+
+                {% if current_user.fish_frenzy_unlocked %}
+                    <p class="shop-status">Unlocked</p>
+                {% else %}
+                    <form method="POST" action="{{ url_for('purchase_shop_item') }}">
+                        <input type="hidden" name="item" value="fish_frenzy">
+                        <button class="primary-button shop-button" type="submit">
+                            Unlock for {{ ability_definitions["fish_frenzy"]["cost"] }} coins
+                        </button>
+                    </form>
+                {% endif %}
+            </article>          
+        </div>
+    </div>
+</section>
+{% endblock %}

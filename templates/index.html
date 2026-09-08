@@ -1,0 +1,26 @@
+{% extends "base.html" %}
+
+{% block body_class %}landing-page{% endblock %}
+
+{% block content %}
+<section class="landing-card-wrap">
+    <div class="intro-card">
+        <div class="intro-card-inner">
+            <p class="card-label">Enter Cat Dash</p>
+            <h2>Log in to play</h2>
+
+            <div class="intro-actions">
+                <a class="primary-button" href="{{ url_for('login') }}">Login</a>
+                <a class="secondary-button" href="{{ url_for('signup') }}">Sign Up</a>
+            </div>
+
+            {% if current_user.is_authenticated %}
+                <div class="return-panel">
+                    <p>You are signed in as <strong>{{ current_user.username }}</strong>.</p>
+                    <a class="inline-link" href="{{ url_for('game') }}">Go to game</a>
+                </div>
+            {% endif %}
+        </div>
+    </div>
+</section>
+{% endblock %}

@@ -1,0 +1,193 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Cat Dash</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
+</head>
+<body class="{% block body_class %}{% endblock %}">
+
+{% if current_user.is_authenticated %}
+<nav class="site-nav">
+    <a class="brand-mark" href="{{ url_for('game') }}">
+        <img src="{{ url_for('static', filename='images/CatDashLogo.png') }}" alt="Cat Dash logo" class="brand-logo">
+        <span>Cat Dash</span>
+    </a>
+
+    <div class="nav-links">
+        <a href="{{ url_for('leaderboard') }}">Leaderboard</a>
+        <a href="{{ url_for('game') }}">Game</a>
+        <a href="{{ url_for('shop') }}">Shop</a>
+
+        <div class="nav-user-menu">
+            <button class="nav-user-toggle" type="button" id="navUserToggle">
+                {{ current_user.username }}
+            </button>
+
+            <div class="nav-user-dropdown hidden" id="navUserDropdown">
+                <a href="{{ url_for('profile') }}">Profile</a>
+                <a href="{{ url_for('inventory') }}">Inventory</a>
+                <a href="{{ url_for('logout') }}">Logout</a>
+            </div>
+        </div>
+    </div>
+</nav>
+{% endif %}
+
+{% with messages = get_flashed_messages() %}
+    {% if messages %}
+        <div class="flash-stack">
+            {% for message in messages %}
+                <p class="flash-box">{{ message }}</p>
+            {% endfor %}
+        </div>
+    {% endif %}
+{% endwith %}
+
+{% if not current_user.is_authenticated %}
+<div class="page-cat-loop" aria-hidden="true">
+    <div class="page-cat-runner page-cat-runner-a">
+        <img src="{{ url_for('static', filename='images/cat1.png') }}" alt="" class="page-cat-frame page-cat-frame-one">
+        <img src="{{ url_for('static', filename='images/cat2.png') }}" alt="" class="page-cat-frame page-cat-frame-two">
+    </div>
+
+    <div class="page-cat-runner page-cat-runner-b">
+        <img src="{{ url_for('static', filename='images/cat1.png') }}" alt="" class="page-cat-frame page-cat-frame-one">
+        <img src="{{ url_for('static', filename='images/cat2.png') }}" alt="" class="page-cat-frame page-cat-frame-two">
+    </div>
+</div>
+{% endif %}
+
+<main class="page-shell">
+    {% block content %}{% endblock %}
+</main>
+
+<script>
+    (() => {
+        const toggle = document.getElementById("navUserToggle");
+        const dropdown = document.getElementById("navUserDropdown");
+
+        if (!toggle || !dropdown) {
+            return;
+        }
+
+        toggle.addEventListener("click", () => {
+            dropdown.classList.toggle("hidden");
+        });
+
+        document.addEventListener("click", (event) => {
+            if (!event.target.closest(".nav-user-menu")) {
+                dropdown.classList.add("hidden");
+            }
+        });
+    })();
+</script>
+
+<script>
+    (() => {
+        const STORAGE_KEY = "pawDriftState";
+        const LOOP_DISTANCE = 128;
+        const LOOP_DURATION_MS = 18000;
+
+        function getCurrentOffset() {
+            const saved = sessionStorage.getItem(STORAGE_KEY);
+
+            if (!saved) {
+                return 0;
+            }
+
+            const savedTime = Number(saved);
+
+            if (Number.isNaN(savedTime)) {
+                return 0;
+            }
+
+            const elapsed = Date.now() - savedTime;
+            const progress = ((elapsed % LOOP_DURATION_MS) + LOOP_DURATION_MS) % LOOP_DURATION_MS;
+            return (progress / LOOP_DURATION_MS) * LOOP_DISTANCE;
+        }
+
+        function applyOffset(offset) {
+            document.body.style.setProperty("--paw-offset-x", `${offset}px`);
+            document.body.style.setProperty("--paw-offset-y", `${offset}px`);
+        }
+
+        function tick() {
+            applyOffset(getCurrentOffset());
+            requestAnimationFrame(tick);
+        }
+
+        if (!sessionStorage.getItem(STORAGE_KEY)) {
+            sessionStorage.setItem(STORAGE_KEY, String(Date.now()));
+        }
+
+        applyOffset(getCurrentOffset());
+        requestAnimationFrame(tick);
+    })();
+</script>
+
+<script>
+    (() => {
+        const catLoop = document.querySelector(".page-cat-loop");
+
+        if (!catLoop) {
+            return;
+        }
+
+        const runnerA = document.querySelector(".page-cat-runner-a");
+        const runnerB = document.querySelector(".page-cat-runner-b");
+
+        if (!runnerA || !runnerB) {
+            return;
+        }
+
+        const STORAGE_KEY = "catLoopStartTime";
+        const LOOP_MS = 14000;
+        const RUNNER_WIDTH = 180;
+        const START_X = -220;
+
+        function getTrackWidth() {
+            return window.innerWidth + RUNNER_WIDTH + 260;
+        }
+
+        function getProgress() {
+            const saved = sessionStorage.getItem(STORAGE_KEY);
+
+            if (!saved) {
+                const now = String(Date.now());
+                sessionStorage.setItem(STORAGE_KEY, now);
+                return 0;
+            }
+
+            const startTime = Number(saved);
+
+            if (Number.isNaN(startTime)) {
+                sessionStorage.setItem(STORAGE_KEY, String(Date.now()));
+                return 0;
+            }
+
+            const elapsed = Date.now() - startTime;
+            return ((elapsed % LOOP_MS) + LOOP_MS) % LOOP_MS / LOOP_MS;
+        }
+
+        function setRunnerX(element, progressOffset) {
+            const trackWidth = getTrackWidth();
+            const progress = (getProgress() + progressOffset) % 1;
+            const x = START_X + (trackWidth * progress);
+            element.style.setProperty("--cat-x", `${x}px`);
+        }
+
+        function tick() {
+            setRunnerX(runnerA, 0);
+            setRunnerX(runnerB, 0.5);
+            requestAnimationFrame(tick);
+        }
+
+        tick();
+    })();
+</script>
+
+
+</body>
+</html>

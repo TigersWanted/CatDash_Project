@@ -1,0 +1,88 @@
+{% extends "base.html" %}
+
+{% block content %}
+<section class="stats-page profile-page">
+    <div class="stats-header">
+        <div>
+            <p class="card-label">Player Profile</p>
+            <h1>{{ current_user.username }}</h1>
+        </div>
+    </div>
+
+    <div class="stats-grid">
+        <article class="stats-card">
+            <p class="stats-label">Current Fishes</p>
+            <h2>{{ current_user.coins }}</h2>
+        </article>
+
+        <article class="stats-card">
+            <p class="stats-label">Lifetime Fishes Collected</p>
+            <h2>{{ current_user.total_coins_earned }}</h2>
+        </article>
+
+        <article class="stats-card">
+            <p class="stats-label">Best Distance</p>
+            <h2>{{ current_user.best_distance|round(0, 'floor')|int }}m</h2>
+        </article>
+    </div>
+
+    <div class="stats-panel">
+        <div class="panel-heading">
+            <h2>Recent Runs</h2>
+        </div>
+
+        {% if recent_runs %}
+            <div class="run-table">
+                <div class="run-row run-row-head">
+                    <span>Date</span>
+                    <span>Distance</span>
+                    <span>Fishes</span>
+                </div>
+                {% for run in recent_runs %}
+                    <div class="run-row">
+                        <span
+                            class="local-run-time"
+                            data-utc="{{ run.created_at.strftime('%Y-%m-%dT%H:%M:%SZ') }}"
+                        >
+                            {{ run.created_at.strftime("%b %d, %Y %I:%M %p") }}
+                        </span>
+                        <span>{{ run.distance|round(0, 'floor')|int }}m</span>
+                        <span>{{ run.coins_collected }}</span>
+                    </div>
+                {% endfor %}
+            </div>
+        {% else %}
+            <p class="empty-state">No runs saved yet. Start a game and finish a run to see your stats here.</p>
+        {% endif %}
+    </div>
+</section>
+
+<script>
+    (() => {
+        const runTimes = document.querySelectorAll(".local-run-time");
+
+        runTimes.forEach((element) => {
+            const utcValue = element.dataset.utc;
+
+            if (!utcValue) {
+                return;
+            }
+
+            const localDate = new Date(utcValue);
+
+            if (Number.isNaN(localDate.getTime())) {
+                return;
+            }
+
+            element.textContent = localDate.toLocaleString([], {
+                month: "short",
+                day: "2-digit",
+                year: "numeric",
+                hour: "numeric",
+                minute: "2-digit"
+            });
+        });
+    })();
+</script>
+
+{% endblock %}

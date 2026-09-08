@@ -1,0 +1,116 @@
+{% extends "base.html" %}
+
+{% block content %}
+<section class="stats-page">
+    <div class="stats-header">
+        <div>
+            <p class="card-label">Leaderboard</p>
+            <h1>Top Cat Dash Players</h1>
+        </div>
+    </div>
+
+    <div class="leaderboard-grid">
+        <article class="stats-panel">
+            <div class="panel-heading">
+                <h2>Farthest Distance</h2>
+                <p>Top 20 best runs</p>
+            </div>
+
+            <div class="run-table leaderboard-scroll-table">
+                <div class="run-row run-row-head">
+                    <span>Rank</span>
+                    <span>Player</span>
+                    <span>Distance</span>
+                </div>
+
+                <div class="leaderboard-scroll-body">
+                {% for user in distance_leaders %}
+                    <div class="run-row{% if current_user.is_authenticated and user.id == current_user.id %} leaderboard-current-user{% endif %}">
+                        <span>#{{ loop.index }}</span>
+                        <span>
+                            {{ user.username }}{% if current_user.is_authenticated and user.id == current_user.id %} (You){% endif %}
+                        </span>
+                        <span>{{ user.best_distance|round(0, 'floor')|int }}m</span>
+                    </div>
+                {% else %}
+                    <p class="empty-state">No distances have been saved yet.</p>
+                {% endfor %}
+                </div>
+            </div>
+        </article>
+
+        <article class="stats-panel">
+            <div class="panel-heading">
+                <h2>Lifetime Fishes Collected</h2>
+                <p>Top 20 total fishes earned</p>
+            </div>
+
+            <div class="run-table leaderboard-scroll-table">
+                <div class="run-row run-row-head">
+                    <span>Rank</span>
+                    <span>Player</span>
+                    <span>Fishes</span>
+                </div>
+
+                <div class="leaderboard-scroll-body">
+                {% for user in coin_leaders %}
+                    <div class="run-row{% if current_user.is_authenticated and user.id == current_user.id %} leaderboard-current-user{% endif %}">
+                        <span>#{{ loop.index }}</span>
+                        <span>
+                            {{ user.username }}{% if current_user.is_authenticated and user.id == current_user.id %} (You){% endif %}
+                        </span>
+                        <span>{{ user.total_coins_earned }}</span>
+                    </div>
+                {% else %}
+                    <p class="empty-state">No fish totals have been saved yet.</p>
+                {% endfor %}
+                </div>
+            </div>
+        </article>
+    </div>
+
+    {% if current_user.is_authenticated %}
+        <div class="leaderboard-grid" style="margin-top: 20px;">
+            <article class="stats-panel">
+                <div class="panel-heading">
+                    <h2>Your Distance Rank</h2>
+                </div>
+
+                <div class="run-table">
+                    <div class="run-row">
+                        <span>
+                            {% if player_distance_rank %}
+                                #{{ player_distance_rank }}
+                            {% else %}
+                                Unranked
+                            {% endif %}
+                        </span>
+                        <span>{{ current_user.username }}</span>
+                        <span>{{ current_user.best_distance|round(0, 'floor')|int }}m</span>
+                    </div>
+                </div>
+            </article>
+
+            <article class="stats-panel">
+                <div class="panel-heading">
+                    <h2>Your Fish Rank</h2>
+                </div>
+
+                <div class="run-table">
+                    <div class="run-row">
+                        <span>
+                            {% if player_coin_rank %}
+                                #{{ player_coin_rank }}
+                            {% else %}
+                                Unranked
+                            {% endif %}
+                        </span>
+                        <span>{{ current_user.username }}</span>
+                        <span>{{ current_user.total_coins_earned }}</span>
+                    </div>
+                </div>
+            </article>
+        </div>
+    {% endif %}
+</section>
+{% endblock %}

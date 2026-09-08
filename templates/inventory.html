@@ -1,0 +1,107 @@
+{% extends "base.html" %}
+
+{% block content %}
+<section class="stats-page inventory-page" id="inventoryPage">
+    <div class="stats-header">
+        <div>
+            <p class="card-label">Inventory</p>
+            <h1>Ability Loadout</h1>
+        </div>
+    </div>
+
+    <div class="inventory-layout">
+        <div class="stats-panel inventory-slots-panel">
+            <div class="panel-heading">
+                <h2>Equipped Slots</h2>
+            </div>
+
+            <div class="inventory-slots" id="inventorySlots">
+                <article class="inventory-slot-card" data-slot-card="one">
+                    <p class="stats-label">Slot 1</p>
+                    <h3>{{ slot_one_ability.name if slot_one_ability else "Empty" }}</h3>
+                    <p class="inventory-slot-key">Keybind: E</p>
+                </article>
+
+                <article class="inventory-slot-card" data-slot-card="two">
+                    <p class="stats-label">Slot 2</p>
+                    <h3>{{ slot_two_ability.name if slot_two_ability else "Empty" }}</h3>
+                    <p class="inventory-slot-key">Keybind: Q</p>
+                </article>
+            </div>
+        </div>
+
+        <div class="stats-panel inventory-owned-panel">
+            <div class="panel-heading">
+                <h2>Owned Abilities</h2>
+            </div>
+
+            {% if unlocked_abilities %}
+                <div class="inventory-owned-grid">
+                    {% for ability in unlocked_abilities %}
+                        <article class="shop-card inventory-owned-card" data-ability-card="{{ ability.id }}">
+                            <div>
+                                <p class="stats-label">{{ ability.name }}</p>
+                                <p class="shop-copy">{{ ability.description }}</p>
+                            </div>
+
+                            {% if ability.id in equipped_abilities %}
+                                <p class="shop-status">Equipped</p>
+                            {% else %}
+                                <button
+                                    class="primary-button inventory-equip-button"
+                                    type="button"
+                                    data-equip-ability="{{ ability.id }}"
+                                >
+                                    Equip
+                                </button>
+                            {% endif %}
+                        </article>
+                    {% endfor %}
+                </div>
+            {% else %}
+                <p class="empty-state">Unlock abilities in the shop first, then equip up to two here.</p>
+            {% endif %}
+        </div>
+    </div>
+
+    <form method="POST" id="inventoryEquipForm" class="hidden">
+        <input type="hidden" name="ability_id" id="inventoryAbilityInput">
+        <input type="hidden" name="target_slot" id="inventorySlotInput">
+    </form>
+</section>
+
+<script>
+    (() => {
+        const abilityInput = document.getElementById("inventoryAbilityInput");
+        const slotInput = document.getElementById("inventorySlotInput");
+        const equipForm = document.getElementById("inventoryEquipForm");
+        const slotCards = document.querySelectorAll("[data-slot-card]");
+        const equipButtons = document.querySelectorAll("[data-equip-ability]");
+        let pendingAbilityId = "";
+
+        equipButtons.forEach((button) => {
+            button.addEventListener("click", () => {
+                pendingAbilityId = button.dataset.equipAbility;
+                abilityInput.value = pendingAbilityId;
+                document.body.classList.add("inventory-choosing-slot");
+                slotCards.forEach((card) => card.classList.add("inventory-slot-target"));
+            });
+        });
+
+        slotCards.forEach((card) => {
+            card.addEventListener("click", (event) => {
+                if (event.target.closest("form")) {
+                    return;
+                }
+
+                if (!pendingAbilityId) {
+                    return;
+                }
+
+                slotInput.value = card.dataset.slotCard;
+                equipForm.submit();
+            });
+        });
+    })();
+</script>
+{% endblock %}
